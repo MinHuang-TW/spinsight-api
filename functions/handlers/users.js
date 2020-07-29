@@ -17,6 +17,8 @@ exports.signup = (req, res) => {
   const { errors, valid } = validateSignupData(newUser);
   if (!valid) return res.status(400).json(errors);
 
+  const defaultImg = 'W2.png';
+
   let token, userId;
   db.doc(`/users/${newUser.name}`)
     .get()
@@ -36,6 +38,7 @@ exports.signup = (req, res) => {
           const userCredentials = {
             name: newUser.name,
             email: newUser.email,
+            image: `https://firebasestorage.googleapis.com/v0/b/${config.storageBucket}/o/${defaultImg}?alt=media`,
             createdAt: new Date().toISOString(),
             userId,
           };
@@ -47,7 +50,7 @@ exports.signup = (req, res) => {
           if (error.code === 'auth/email-already-in-use') {
             return res
               .status(400)
-              .json({ email: 'Email is already in use 🤦🏻‍♀️' });
+              .json({ email: 'Email is already in use 🙅🏻‍♀️' });
           }
           return res.status(500).json({ error: error.code });
         });
@@ -73,8 +76,33 @@ exports.login = (req, res) => {
       if (error.code === 'auth/wrong-password') {
         return res
           .status(403)
-          .json({ general: 'Wrong credentials, please try again.' });
+          .json({ general: 'Wrong credentials, please try again. 🙅🏻‍♀️' });
       }
+      return res.status(500).json({ error: error.code });
+    });
+};
+
+exports.getProfile = (req, res) => {
+  let userData = {};
+
+  db.doc(`/users/${req.user.name}`)
+    .get()
+    .then((doc) => {
+      if (doc.exists) {
+        userData.credentials = doc.data();
+        return db.collection('saves').where('name', '==', req.user.name).get();
+      }
+    })
+    .then((data) => {
+      userData.saves = [];
+
+      data.forEach((doc) => {
+        userData.saves.push(doc.data());
+      });
+      return res.json(userData);
+    })
+    .catch((error) => {
+      console.error(error);
       return res.status(500).json({ error: error.code });
     });
 };
