@@ -9,6 +9,8 @@ const {
   getAllQuestions,
   getQuestion,
   addQuestion,
+  saveQuestion,
+  unsaveQuestion,
   AddAnswer,
 } = require('./handlers/questions');
 const { signup, login, getProfile } = require('./handlers/users');
@@ -19,8 +21,8 @@ app.get('/question/:questionId', FBAuth, getQuestion);
 app.post('/question/:questionId/answer', FBAuth, AddAnswer);
 app.post('/question', FBAuth, addQuestion);
 // TODO: delete a question
-// TODO: save a question
-// TODO: unsave a question
+app.get('/question/:questionId/save', FBAuth, saveQuestion);
+app.get('/question/:questionId/unsave', FBAuth, unsaveQuestion);
 
 // User routes
 app.post('/signup', signup);

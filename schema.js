@@ -21,9 +21,15 @@ let db = {
     {
       name: 'user',
       image: '...',
-      questionId: 'Jk6OrfHqTvPAdJ9sxeuf',
+      questionId: 'FuWzcSbPgJIybRKmHNwZ',
       answer: 'John Doe',
       createdAt: '2020-07-31T05:05:31.444Z',
+    },
+  ],
+  saves: [
+    {
+      name: 'user',
+      questionId: 'FuWzcSbPgJIybRKmHNwZ',
     },
   ],
 };

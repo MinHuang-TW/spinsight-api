@@ -23,8 +23,13 @@ exports.getAllQuestions = (req, res) => {
 };
 
 exports.addQuestion = (req, res) => {
+  if (req.body.question.trim() === '') {
+    res.status(400).json({ error: 'Must not be empty. 🙅🏻‍♀️' });
+  }
+
   const newQuestion = {
     author: req.user.name,
+    image: req.user.image,
     category: req.body.category,
     question: req.body.question,
     createdAt: new Date().toISOString(),
@@ -33,9 +38,9 @@ exports.addQuestion = (req, res) => {
   db.collection('questions')
     .add(newQuestion)
     .then((doc) => {
-      res.status(200).json({
-        message: `Question ${doc.id} has been added successfully. 🙆🏻‍♂️`,
-      });
+      const resQuestion = newQuestion;
+      resQuestion.questionId = doc.id;
+      res.status(200).json(resQuestion);
     })
     .catch((error) => {
       console.error(error);
@@ -97,5 +102,84 @@ exports.AddAnswer = (req, res) => {
     .catch((error) => {
       console.error(error);
       res.status(500).json({ error: 'An unexpected error has occurred... 🤦🏻‍♀️' });
+    });
+};
+
+exports.saveQuestion = (req, res) => {
+  const saveDocument = db
+    .collection('saves')
+    .where('name', '==', req.user.name)
+    .where('questionId', '==', req.params.questionId)
+    .limit(1);
+
+  const questionDocument = db.doc(`/questions/${req.params.questionId}`);
+
+  let questionData;
+
+  questionDocument
+    .get()
+    .then((doc) => {
+      if (doc.exists) {
+        questionData = doc.data();
+        questionData.questionId = doc.id;
+        return saveDocument.get();
+      } else {
+        return res.status(404).json({ error: 'Question not found. 🤷🏻‍♀️' });
+      }
+    })
+    .then((data) => {
+      if (data.empty) {
+        return db
+          .collection('saves')
+          .add({
+            questionId: req.params.questionId,
+            name: req.user.name,
+          })
+          .then(() => res.json(questionData));
+      } else {
+        return res.status(400).json({ error: 'Question already saved. 🙋🏻‍♀️' });
+      }
+    })
+    .catch((error) => {
+      console.error(error);
+      res.status(500).json({ error: error.code });
+    });
+};
+
+exports.unsaveQuestion = (req, res) => {
+  const saveDocument = db
+    .collection('saves')
+    .where('name', '==', req.user.name)
+    .where('questionId', '==', req.params.questionId)
+    .limit(1);
+
+  const questionDocument = db.doc(`/questions/${req.params.questionId}`);
+
+  let questionData;
+
+  questionDocument
+    .get()
+    .then((doc) => {
+      if (doc.exists) {
+        questionData = doc.data();
+        questionData.questionId = doc.id;
+        return saveDocument.get();
+      } else {
+        return res.status(404).json({ error: 'Question not found. 🤷🏻‍♀️' });
+      }
+    })
+    .then((data) => {
+      if (data.empty) {
+        return res.status(400).json({ error: 'Question not saved. 🤷🏻‍♀️' });
+      } else {
+        return db
+          .doc(`/saves/${data.docs[0].id}`)
+          .delete()
+          .then(() => res.json(`${questionData.questionId} is unsaved. 💁🏻‍♂️`));
+      }
+    })
+    .catch((error) => {
+      console.error(error);
+      res.status(500).json({ error: error.code });
     });
 };
