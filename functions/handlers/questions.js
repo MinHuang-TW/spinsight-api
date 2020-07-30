@@ -59,6 +59,7 @@ exports.getQuestion = (req, res) => {
         return res.status(404).json({ error: 'Question not found. 🤷🏻‍♀️' });
       }
       questionData = doc.data();
+      questionData.name = req.user.name;
       questionData.questionId = doc.id;
       return db
         .collection('answers')
@@ -96,9 +97,11 @@ exports.AddAnswer = (req, res) => {
       if (!doc.exists) {
         return res.status(404).json({ error: 'Question does not exist. 🤷🏻‍♀️' });
       }
-      return db.collection('answers').add(newAnswer);
+      return db
+        .collection('answers')
+        .add({ ...newAnswer, category: doc.data().category });
     })
-    .then(() => res.json(newAnswer))
+    .then(() => res.json({ ...newAnswer, category: doc.data().category }))
     .catch((error) => {
       console.error(error);
       res.status(500).json({ error: 'An unexpected error has occurred... 🤦🏻‍♀️' });
@@ -181,5 +184,26 @@ exports.unsaveQuestion = (req, res) => {
     .catch((error) => {
       console.error(error);
       res.status(500).json({ error: error.code });
+    });
+};
+
+exports.deleteQuestion = (req, res) => {
+  const document = db.doc(`/questions/${req.params.questionId}`);
+  document
+    .get()
+    .then((doc) => {
+      if (!doc.exists) {
+        return res.status(404).json({ error: 'Question not found. 🤷🏻‍♀️' });
+      }
+      if (doc.data().author !== req.user.name) {
+        return res.status(403).json({ error: 'Unauthorized.' });
+      } else {
+        return document.delete();
+      }
+    })
+    .then(() => res.json({ message: 'Question deleted successfully. 🙋🏻‍♀️' }))
+    .catch((error) => {
+      console.error(error);
+      return res.status(500).json({ error: error.code });
     });
 };

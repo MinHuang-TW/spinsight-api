@@ -12,6 +12,7 @@ let db = {
   questions: [
     {
       author: 'user',
+      name: 'user',
       category: 'appearance',
       question: 'Who has blue eyes?',
       createdAt: '2020-07-29T05:05:31.444Z',

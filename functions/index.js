@@ -12,17 +12,18 @@ const {
   saveQuestion,
   unsaveQuestion,
   AddAnswer,
+  deleteQuestion,
 } = require('./handlers/questions');
 const { signup, login, getProfile } = require('./handlers/users');
 
 // Question routes
 app.get('/questions', FBAuth, getAllQuestions);
 app.get('/question/:questionId', FBAuth, getQuestion);
-app.post('/question/:questionId/answer', FBAuth, AddAnswer);
-app.post('/question', FBAuth, addQuestion);
-// TODO: delete a question
 app.get('/question/:questionId/save', FBAuth, saveQuestion);
 app.get('/question/:questionId/unsave', FBAuth, unsaveQuestion);
+app.post('/question', FBAuth, addQuestion);
+app.delete('/question/:questionId', FBAuth, deleteQuestion);
+app.post('/question/:questionId/answer', FBAuth, AddAnswer);
 
 // User routes
 app.post('/signup', signup);
