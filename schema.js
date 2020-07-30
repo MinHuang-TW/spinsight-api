@@ -14,23 +14,25 @@ let db = {
       category: 'appearance',
       question: 'Who has blue eyes?',
       author: 'user', // create the question
-      // names: ['user'], already got the question
-      // answers: [], mentioned in the question
+      image: '', // author's avatar
       createdAt: '2020-07-29T05:05:31.444Z',
+      // names: ['user'], already got the question
     },
   ],
   answers: [
     {
       name: 'user',
       image: '...',
-      questionId: 'FuWzcSbPgJIybRKmHNwZ',
       answer: 'John Doe',
+      category: 'character',
+      questionId: 'vRAPqgx9zdOqGSXjJTWO',
       createdAt: '2020-07-31T05:05:31.444Z',
     },
   ],
   saves: [
     {
       name: 'user',
+      category: 'character',
       questionId: 'FuWzcSbPgJIybRKmHNwZ',
     },
   ],
@@ -57,11 +59,10 @@ const userDetails = {
       createdAt: '2020-07-31T05:05:31.444Z',
     },
   ],
-  // TODO:
   saves: [
     {
       name: 'user',
-      // category: 'appearance',
+      category: 'appearance',
       questionId: 'Jk6OrfHqTvPAdJ9sxeuf',
     },
   ],

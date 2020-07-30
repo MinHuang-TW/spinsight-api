@@ -84,7 +84,6 @@ exports.login = (req, res) => {
     });
 };
 
-// TODO: answers? saves?
 exports.getProfile = (req, res) => {
   let userData = {};
 
@@ -101,10 +100,12 @@ exports.getProfile = (req, res) => {
     })
     .then((data) => {
       userData.answers = [];
-
-      data.forEach((doc) => {
-        userData.answers.push(doc.data());
-      });
+      data.forEach((doc) => userData.answers.push(doc.data()));
+      return db.collection('saves').where('name', '==', req.user.name).get();
+    })
+    .then((data) => {
+      userData.saves = [];
+      data.forEach((doc) => userData.saves.push(doc.data()));
       return res.json(userData);
     })
     .catch((error) => {

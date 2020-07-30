@@ -85,6 +85,7 @@ exports.AddAnswer = (req, res) => {
     image: req.user.image,
     answer: req.body.answer,
     questionId: req.params.questionId,
+    category: null,
     createdAt: new Date().toISOString(),
   };
 
@@ -94,11 +95,10 @@ exports.AddAnswer = (req, res) => {
       if (!doc.exists) {
         return res.status(404).json({ error: 'Question not found. 🤷🏻‍♀️' });
       }
-      return db
-        .collection('answers')
-        .add({ ...newAnswer, category: doc.data().category });
+      newAnswer.category = doc.data().category;
+      return db.collection('answers').add(newAnswer);
     })
-    .then(() => res.json({ ...newAnswer, category: doc.data().category }))
+    .then(() => res.status(200).json(newAnswer))
     .catch((error) => {
       console.error(error);
       res.status(500).json({ error: 'An unexpected error has occurred... 🤦🏻‍♀️' });
@@ -115,12 +115,14 @@ exports.saveQuestion = (req, res) => {
   const questionDocument = db.doc(`/questions/${req.params.questionId}`);
 
   let questionData;
+  let category;
 
   questionDocument
     .get()
     .then((doc) => {
       if (doc.exists) {
         questionData = doc.data();
+        category = doc.data().category;
         questionData.questionId = doc.id;
         return saveDocument.get();
       } else {
@@ -134,6 +136,7 @@ exports.saveQuestion = (req, res) => {
           .add({
             questionId: req.params.questionId,
             name: req.user.name,
+            category,
           })
           .then(() => res.json(questionData));
       } else {
