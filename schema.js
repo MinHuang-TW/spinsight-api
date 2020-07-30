@@ -11,10 +11,11 @@ let db = {
   ],
   questions: [
     {
-      author: 'user',
-      name: 'user',
       category: 'appearance',
       question: 'Who has blue eyes?',
+      author: 'user', // create the question
+      // names: ['user'], already got the question
+      // answers: [], mentioned in the question
       createdAt: '2020-07-29T05:05:31.444Z',
     },
   ],
@@ -46,20 +47,21 @@ const userDetails = {
     // TODO:
     company: 'test Inc.',
   },
-  saves: [
-    {
-      name: 'user',
-      // author: 'user',
-      category: 'appearance',
-      questionId: 'Jk6OrfHqTvPAdJ9sxeuf',
-    },
-  ],
-  // TODO:
   answers: [
     {
       name: 'user',
-      // author: 'user',
-      category: 'appearance',
+      image:
+        'https://firebasestorage.googleapis.com/v0/b/spinsight-api.appspot.com/o/W2.png?alt=media',
+      questionId: 'FuWzcSbPgJIybRKmHNwZ',
+      answer: 'John Doe',
+      createdAt: '2020-07-31T05:05:31.444Z',
+    },
+  ],
+  // TODO:
+  saves: [
+    {
+      name: 'user',
+      // category: 'appearance',
       questionId: 'Jk6OrfHqTvPAdJ9sxeuf',
     },
   ],

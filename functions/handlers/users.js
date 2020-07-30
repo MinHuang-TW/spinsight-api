@@ -52,7 +52,9 @@ exports.signup = (req, res) => {
               .status(400)
               .json({ email: 'Email is already in use 🙅🏻‍♀️' });
           }
-          return res.status(500).json({ error: error.code });
+          return res
+            .status(500)
+            .json({ error: 'An unexpected error has occurred... 🤦🏻‍♀️' });
         });
     });
 };
@@ -73,15 +75,16 @@ exports.login = (req, res) => {
     .then((token) => res.json({ token }))
     .catch((error) => {
       console.error(error);
-      if (error.code === 'auth/wrong-password') {
-        return res
-          .status(403)
-          .json({ general: 'Wrong credentials, please try again. 🙅🏻‍♀️' });
-      }
-      return res.status(500).json({ error: error.code });
+      // if (error.code === 'auth/wrong-password') {
+      return res
+        .status(403)
+        .json({ general: 'Wrong credentials, please try again. 🙅🏻‍♀️' });
+      // }
+      // return res.status(500).json({ error: error.code });
     });
 };
 
+// TODO: answers? saves?
 exports.getProfile = (req, res) => {
   let userData = {};
 
@@ -90,14 +93,17 @@ exports.getProfile = (req, res) => {
     .then((doc) => {
       if (doc.exists) {
         userData.credentials = doc.data();
-        return db.collection('saves').where('name', '==', req.user.name).get();
+        return db
+          .collection('answers')
+          .where('name', '==', req.user.name)
+          .get();
       }
     })
     .then((data) => {
-      userData.saves = [];
+      userData.answers = [];
 
       data.forEach((doc) => {
-        userData.saves.push(doc.data());
+        userData.answers.push(doc.data());
       });
       return res.json(userData);
     })

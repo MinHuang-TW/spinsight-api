@@ -4,6 +4,7 @@ const cors = require('cors');
 app.use(cors({ origin: true }));
 
 const FBAuth = require('./util/FBAuth');
+const { db } = require('./util/admin');
 
 const {
   getAllQuestions,
@@ -31,3 +32,31 @@ app.post('/login', login);
 app.get('/user', FBAuth, getProfile);
 
 exports.api = functions.region('europe-west1').https.onRequest(app);
+
+exports.onQuestionDelete = functions
+  .region('europe-west1')
+  .firestore.document('questions/{questionId}')
+  .onDelete((snapshot, context) => {
+    const questionId = context.params.questionId;
+    const batch = db.batch();
+    return db
+      .collection('answers')
+      .where('questionId', '==', questionId)
+      .get()
+      .then((data) => {
+        data.forEach((doc) => {
+          batch.delete(db.doc(`/answers/${doc.id}`));
+        });
+        return db
+          .collection('saves')
+          .where('questionId', '==', questionId)
+          .get();
+      })
+      .then((data) => {
+        data.forEach((doc) => {
+          batch.delete(db.doc(`/saves/${doc.id}`));
+        });
+        return batch.commit();
+      })
+      .catch((error) => console.error(error));
+  });

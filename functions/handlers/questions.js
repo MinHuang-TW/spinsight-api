@@ -16,15 +16,40 @@ exports.getAllQuestions = (req, res) => {
     })
     .catch((error) => {
       console.error(error);
-      res
-        .status(500)
-        .json({ message: 'An unexpected error has occurred... 🤦🏻‍♀️' });
+      res.status(500).json({ error: 'An unexpected error has occurred... 🤦🏻‍♀️' });
+    });
+};
+
+exports.getQuestion = (req, res) => {
+  let questionData = {};
+  db.doc(`/questions/${req.params.questionId}`)
+    .get()
+    .then((doc) => {
+      if (!doc.exists) {
+        return res.status(404).json({ error: 'Question not found. 🤷🏻‍♀️' });
+      }
+      questionData = doc.data();
+      questionData.questionId = doc.id;
+      return db
+        .collection('answers')
+        .orderBy('createdAt', 'desc')
+        .where('questionId', '==', req.params.questionId)
+        .get();
+    })
+    .then((data) => {
+      questionData.answers = [];
+      data.forEach((doc) => questionData.answers.push(doc.data()));
+      return res.json(questionData);
+    })
+    .catch((error) => {
+      console.error(error);
+      res.status(500).json({ error: error.code });
     });
 };
 
 exports.addQuestion = (req, res) => {
   if (req.body.question.trim() === '') {
-    res.status(400).json({ error: 'Must not be empty. 🙅🏻‍♀️' });
+    res.status(400).json({ question: 'Must not be empty. 🙅🏻‍♀️' });
   }
 
   const newQuestion = {
@@ -50,37 +75,9 @@ exports.addQuestion = (req, res) => {
     });
 };
 
-exports.getQuestion = (req, res) => {
-  let questionData = {};
-  db.doc(`/questions/${req.params.questionId}`)
-    .get()
-    .then((doc) => {
-      if (!doc.exists) {
-        return res.status(404).json({ error: 'Question not found. 🤷🏻‍♀️' });
-      }
-      questionData = doc.data();
-      questionData.name = req.user.name;
-      questionData.questionId = doc.id;
-      return db
-        .collection('answers')
-        .orderBy('createdAt', 'desc')
-        .where('questionId', '==', req.params.questionId)
-        .get();
-    })
-    .then((data) => {
-      questionData.answers = [];
-      data.forEach((doc) => questionData.answers.push(doc.data()));
-      return res.json(questionData);
-    })
-    .catch((error) => {
-      console.error(error);
-      res.status(500).json({ error: error.code });
-    });
-};
-
 exports.AddAnswer = (req, res) => {
   if (req.body.answer.trim() === '') {
-    return res.status(400).json({ error: 'Must not be empty. 🙅🏻‍♀️' });
+    return res.status(400).json({ answer: 'Must not be empty. 🙅🏻‍♀️' });
   }
 
   const newAnswer = {
@@ -95,7 +92,7 @@ exports.AddAnswer = (req, res) => {
     .get()
     .then((doc) => {
       if (!doc.exists) {
-        return res.status(404).json({ error: 'Question does not exist. 🤷🏻‍♀️' });
+        return res.status(404).json({ error: 'Question not found. 🤷🏻‍♀️' });
       }
       return db
         .collection('answers')
