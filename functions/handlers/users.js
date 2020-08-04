@@ -9,6 +9,7 @@ const { validateSignupData, validateLoginData } = require('../util/validator');
 exports.signup = (req, res) => {
   const newUser = {
     name: req.body.name,
+    image: req.body.image,
     email: req.body.email,
     password: req.body.password,
     confirmPassword: req.body.confirmPassword,
@@ -16,8 +17,6 @@ exports.signup = (req, res) => {
 
   const { errors, valid } = validateSignupData(newUser);
   if (!valid) return res.status(400).json(errors);
-
-  const defaultImg = 'W2.png';
 
   let token, userId;
   db.doc(`/users/${newUser.name}`)
@@ -38,7 +37,7 @@ exports.signup = (req, res) => {
           const userCredentials = {
             name: newUser.name,
             email: newUser.email,
-            image: `https://firebasestorage.googleapis.com/v0/b/${config.storageBucket}/o/${defaultImg}?alt=media`,
+            image: newUser.image,
             createdAt: new Date().toISOString(),
             userId,
           };

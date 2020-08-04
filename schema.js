@@ -19,6 +19,15 @@ let db = {
       // names: ['user'], already got the question
     },
   ],
+  life: [
+    {
+      category: 'life',
+      question: 'Who has Romantic Hometown ?',
+      author: 'Jane', // create the question
+      createdAt: '2020-07-29T05:05:31.444Z',
+      // names: ['user'], already got the question
+    },
+  ],
   answers: [
     {
       name: 'user',

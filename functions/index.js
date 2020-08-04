@@ -8,6 +8,7 @@ const { db } = require('./util/admin');
 
 const {
   getAllQuestions,
+  getCategoryQuestions,
   getQuestion,
   addQuestion,
   saveQuestion,
@@ -19,12 +20,14 @@ const { signup, login, getProfile } = require('./handlers/users');
 
 // Question routes
 app.get('/questions', FBAuth, getAllQuestions);
-app.get('/question/:questionId', FBAuth, getQuestion);
-app.get('/question/:questionId/save', FBAuth, saveQuestion);
-app.get('/question/:questionId/unsave', FBAuth, unsaveQuestion);
+app.get('/questions/:category', FBAuth, getCategoryQuestions);
+app.get('/question/:category/:questionId', FBAuth, getQuestion);
+app.get('/question/:category/:questionId/save', FBAuth, saveQuestion);
+app.get('/question/:category/:questionId/unsave', FBAuth, unsaveQuestion);
 app.post('/question', FBAuth, addQuestion);
+// TODO: delete
 app.delete('/question/:questionId', FBAuth, deleteQuestion);
-app.post('/question/:questionId/answer', FBAuth, AddAnswer);
+app.post('/question/:category/:questionId/answer', FBAuth, AddAnswer);
 
 // User routes
 app.post('/signup', signup);

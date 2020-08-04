@@ -20,9 +20,28 @@ exports.getAllQuestions = (req, res) => {
     });
 };
 
+exports.getCategoryQuestions = (req, res) => {
+  db.collection(`/${req.params.category}`)
+    .get()
+    .then((docs) => {
+      let response = [];
+      docs.forEach((doc) => {
+        response.push({
+          id: doc.id,
+          ...doc.data(),
+        });
+      });
+      return res.status(200).json(response);
+    })
+    .catch((error) => {
+      console.error(error);
+      res.status(500).json({ error: 'An unexpected error has occurred... 🤦🏻‍♀️' });
+    });
+};
+
 exports.getQuestion = (req, res) => {
   let questionData = {};
-  db.doc(`/questions/${req.params.questionId}`)
+  db.doc(`/${req.params.category}/${req.params.questionId}`)
     .get()
     .then((doc) => {
       if (!doc.exists) {
@@ -54,13 +73,13 @@ exports.addQuestion = (req, res) => {
 
   const newQuestion = {
     author: req.user.name,
-    image: req.user.image,
+    // image: req.user.image,
     category: req.body.category,
     question: req.body.question,
     createdAt: new Date().toISOString(),
   };
 
-  db.collection('questions')
+  db.collection(`${req.body.category}`)
     .add(newQuestion)
     .then((doc) => {
       const resQuestion = newQuestion;
@@ -82,20 +101,20 @@ exports.AddAnswer = (req, res) => {
 
   const newAnswer = {
     name: req.user.name,
-    image: req.user.image,
+    // image: req.user.image,
     answer: req.body.answer,
+    category: req.params.category,
     questionId: req.params.questionId,
-    category: null,
     createdAt: new Date().toISOString(),
   };
 
-  db.doc(`/questions/${req.params.questionId}`)
+  db.doc(`/${req.params.category}/${req.params.questionId}`)
     .get()
     .then((doc) => {
       if (!doc.exists) {
         return res.status(404).json({ error: 'Question not found. 🤷🏻‍♀️' });
       }
-      newAnswer.category = doc.data().category;
+      // newAnswer.category = doc.data().category;
       return db.collection('answers').add(newAnswer);
     })
     .then(() => res.status(200).json(newAnswer))
@@ -112,7 +131,9 @@ exports.saveQuestion = (req, res) => {
     .where('questionId', '==', req.params.questionId)
     .limit(1);
 
-  const questionDocument = db.doc(`/questions/${req.params.questionId}`);
+  const questionDocument = db.doc(
+    `/${req.params.category}/${req.params.questionId}`
+  );
 
   let questionData;
   let category;
@@ -156,7 +177,9 @@ exports.unsaveQuestion = (req, res) => {
     .where('questionId', '==', req.params.questionId)
     .limit(1);
 
-  const questionDocument = db.doc(`/questions/${req.params.questionId}`);
+  const questionDocument = db.doc(
+    `/${req.params.category}/${req.params.questionId}`
+  );
 
   let questionData;
 
@@ -187,6 +210,7 @@ exports.unsaveQuestion = (req, res) => {
     });
 };
 
+// TODO:
 exports.deleteQuestion = (req, res) => {
   const document = db.doc(`/questions/${req.params.questionId}`);
   document
