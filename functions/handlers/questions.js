@@ -8,7 +8,7 @@ exports.getAllQuestions = (req, res) => {
       let response = [];
       docs.forEach((doc) => {
         response.push({
-          id: doc.id,
+          questionId: doc.id,
           ...doc.data(),
         });
       });
@@ -27,7 +27,7 @@ exports.getCategoryQuestions = (req, res) => {
       let response = [];
       docs.forEach((doc) => {
         response.push({
-          id: doc.id,
+          questionId: doc.id,
           ...doc.data(),
         });
       });
