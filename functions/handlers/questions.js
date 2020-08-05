@@ -201,7 +201,7 @@ exports.unsaveQuestion = (req, res) => {
         return db
           .doc(`/saves/${data.docs[0].id}`)
           .delete()
-          .then(() => res.json(`${questionData.questionId} is unsaved. 💁🏻‍♂️`));
+          .then(() => res.json(questionData));
       }
     })
     .catch((error) => {
