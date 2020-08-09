@@ -3,11 +3,11 @@ const app = require('express')();
 const cors = require('cors');
 
 const corsOptions = {
-  origin: 'https://spinsight.netlify.app/',
-  preflightContinue: true,
+  origin: 'https://spinsight.netlify.app',
+  credentials: true,
   optionsSuccessStatus: 200,
 };
-app.options('*', cors(corsOptions));
+app.use(cors(corsOptions));
 
 const FBAuth = require('./util/FBAuth');
 const { db } = require('./util/admin');
