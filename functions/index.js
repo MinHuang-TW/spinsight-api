@@ -1,7 +1,13 @@
 const functions = require('firebase-functions');
 const app = require('express')();
 const cors = require('cors');
-app.use(cors({ origin: true }));
+
+const corsOptions = {
+  origin: 'https://spinsight.netlify.app/',
+  preflightContinue: true,
+  optionsSuccessStatus: 200,
+};
+app.options('*', cors(corsOptions));
 
 const FBAuth = require('./util/FBAuth');
 const { db } = require('./util/admin');
